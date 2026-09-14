@@ -1,0 +1,3 @@
+export function distance(a,b){const rad=Math.PI/180,dLat=(b.lat-a.lat)*rad,dLng=(b.lng-a.lng)*rad;const h=Math.sin(dLat/2)**2+Math.cos(a.lat*rad)*Math.cos(b.lat*rad)*Math.sin(dLng/2)**2;return 6371000*2*Math.atan2(Math.sqrt(Math.min(1,h)),Math.sqrt(Math.max(0,1-h)));}
+export function ranked(rows,origin){return rows.map(t=>({...t,distance:distance(origin,t)})).sort((a,b)=>a.distance-b.distance||String(a.id).localeCompare(String(b.id)));}
+export function routeUrl(origin,t){return `https://map.kakao.com/link/by/walk/${encodeURIComponent('출발지')},${origin.lat},${origin.lng}/${encodeURIComponent(t.name)},${t.lat},${t.lng}`;}

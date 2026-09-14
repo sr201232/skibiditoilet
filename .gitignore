@@ -1,6 +1,10 @@
+work/
+outputs/
+.sites-runtime/
+dist/
 web_example/
 .env
 .env.*
 !.env.example
 node_modules/
-.DS_Store
+.vercel/

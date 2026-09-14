@@ -1,0 +1,2 @@
+import {getDataset} from './repository.mjs';import {handleApi} from './api.mjs';
+export async function handleRequest(request){try{return await handleApi(request,await getDataset());}catch(e){const setup=['DATABASE_NOT_CONFIGURED','DATABASE_EMPTY'].includes(e.message);return Response.json({error:setup?'화장실 데이터베이스 연결 또는 데이터 등록이 필요합니다.':'화장실 데이터베이스에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.'},{status:503,headers:{'Cache-Control':'no-store'}});}}
