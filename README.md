@@ -7,23 +7,23 @@
 - 프런트엔드: HTML, CSS, JavaScript, Leaflet, OpenStreetMap
 - 백엔드: Vercel Functions
 - 데이터베이스: Supabase PostgreSQL 및 REST API
-- AI: Groq `openai/gpt-oss-20b`
+- AI: 서버 기반 대화형 화장실 도우미
 - 배포: Vercel + GitHub
 
-Groq는 “24시간 화장실 찾아줘” 같은 문장을 안전한 검색 조건으로 변환합니다. 위치와 필터 조건은 Vercel 백엔드가 받아 Supabase 데이터로 최근접 화장실을 계산합니다. 사용자 위치는 저장하지 않습니다.
+화장실 도우미는 “24시간 이용 가능한 곳 알려줘” 같은 요청과 이어지는 질문을 대화 형식으로 처리합니다. 위치와 대화에서 확인된 조건은 Vercel 백엔드가 받아 Supabase 데이터로 최근접 화장실을 계산합니다. 사용자 위치는 저장하지 않습니다.
 
 ## VS Code에서 실행
 
 Node.js 22 이상이 필요합니다. `skibidi_toilet.code-workspace`를 열고 **F5 → 화장실 사이트 전체 실행**을 선택하거나 터미널에서 `npm start`를 실행한 다음 `http://127.0.0.1:4173`을 여세요.
 
-로컬 기본값은 포함된 공공데이터 스냅샷을 사용합니다. Groq 검색과 Supabase 연결까지 확인하려면 `.env.example`을 참고해 `.env.local`을 만들고 값을 입력하세요. 비밀 키 파일은 GitHub에 올라가지 않습니다.
+로컬 기본값은 포함된 공공데이터 스냅샷을 사용합니다. 대화 기능과 Supabase 연결까지 확인하려면 `.env.example`을 참고해 `.env.local`을 만들고 값을 입력하세요. 비밀 키 파일은 GitHub에 올라가지 않습니다.
 
 ## 구조
 
 ```text
 public/       화면, 지도, 위치 및 길찾기 UI
 api/          Vercel 서버리스 함수 진입점
-server/       데이터 조회, 최근접 계산, Groq 검색 로직
+server/       데이터 조회, 최근접 계산, 대화 처리 로직
 data/         로컬 개발용 서울시 데이터 스냅샷
 supabase/     테이블 및 보안 정책 SQL
 scripts/      배포 전 검증
@@ -39,7 +39,8 @@ web_example/  기존 실습 자료 보존본(로컬 전용)
 | `GET /api/health` | 서버 상태와 데이터 건수 |
 | `GET /api/toilets` | 지도에 표시할 화장실 목록 |
 | `POST /api/nearest` | 위도·경도로 가까운 6곳 계산 |
-| `POST /api/search` | Groq로 자연어 조건을 해석한 뒤 가까운 6곳 계산 |
+| `POST /api/chat` | 최근 대화를 이해하고 조건에 맞는 가까운 6곳 추천 |
+| `POST /api/search` | 기존 단일 자연어 검색 요청 호환 |
 
 ## Vercel 환경 변수
 
