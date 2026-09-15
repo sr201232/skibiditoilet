@@ -19,10 +19,11 @@ export async function handleApi(request,dataset,interpret=interpretQuery){
   const messages=pathname==='/api/chat'?input.messages:[{role:'user',content:input.query}];
   if(!Array.isArray(messages)||!messages.length||messages.length>8||messages.some(m=>!['user','assistant'].includes(m?.role)||typeof m.content!=='string'||!m.content.trim()||m.content.length>300))return json({error:'대화 내용을 확인해 주세요.'},400);
   try{filters=await interpret(messages);}catch(e){return json({error:e.message==='AI_NOT_CONFIGURED'?'대화 기능 연결 설정이 필요합니다. 기본 가까운 화장실 찾기는 이용할 수 있어요.':e.message==='AI_RATE_LIMIT'?'요청이 많습니다. 잠시 후 다시 말씀해 주세요.':'대화 처리에 실패했습니다. 잠시 후 다시 말씀해 주세요.'},503);}
-  if(filters.search&&!filters.unsupported)candidates=candidates.filter(t=>(!filters.open24h||t.hours.includes('24시간'))&&(!filters.keyword||(t.name+' '+t.address).toLowerCase().includes(filters.keyword.toLowerCase())));
+  if(filters.search&&!filters.unsupported){const keyword=filters.keyword.replace(/24\s*시간|화장실|찾아주세요|알려주세요|찾아줘|알려줘|가능한|이용|가능|근처|가까운|곳/g,' ').replace(/\s+/g,' ').trim();filters={...filters,keyword};candidates=candidates.filter(t=>(!filters.open24h||t.hours.includes('24시간'))&&(!keyword||(t.name+' '+t.address).toLowerCase().includes(keyword.toLowerCase())));}
   else return json({rows:[],filters,searched:false,reply:filters.reply,retrievedAt:dataset.retrievedAt});
  }
  const origin={lat,lng};const nearest=ranked(candidates,origin).slice(0,6);
- const reply=filters?nearest.length?`${filters.reply} 가까운 순으로 ${nearest.length}곳을 보여드릴게요.`:`${filters.reply} 조건에 맞는 화장실을 찾지 못했어요.`:undefined;
+ const searchSummary=filters?.keyword?filters.open24h?`${filters.keyword}에서 24시간 운영으로 등록된 화장실을 찾아봤어요.`:`${filters.keyword} 주변 화장실을 찾아봤어요.`:filters?.open24h?'24시간 운영으로 등록된 화장실을 찾아봤어요.':'가까운 화장실을 찾아봤어요.';
+ const reply=filters?nearest.length?`${searchSummary} 가까운 순으로 ${nearest.length}곳을 보여드릴게요.`:`${searchSummary} 조건에 맞는 화장실은 찾지 못했어요.`:undefined;
  return json({coverage:!!nearest.length&&nearest[0].distance<=10000,rows:nearest.map(t=>({...t,routeUrl:routeUrl(origin,t)})),filters,searched:!!filters,reply,distanceMethod:'straight-line',retrievedAt:dataset.retrievedAt});
 }
