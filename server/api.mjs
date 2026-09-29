@@ -3,8 +3,14 @@ import { interpretQuery } from './groq.mjs';
 
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 // Public dataset only; exact user coordinates are never written to storage or logs.
-export async function handleApi(request,dataset,interpret=interpretQuery){
+export async function handleApi(request,dataset,interpret=interpretQuery,env=process.env){
  const {pathname}=new URL(request.url);
+ if(pathname==='/api/config'){
+  if(request.method!=='GET')return json({error:'GET 요청만 지원합니다.'},405);
+  const supabaseUrl=env.SUPABASE_URL,supabaseKey=env.SUPABASE_PUBLISHABLE_KEY;
+  if(!supabaseUrl||!supabaseKey)return json({error:'로그인 연결 설정이 필요합니다.'},503);
+  return json({supabaseUrl,supabaseKey});
+ }
  if(pathname==='/api/health')return request.method==='GET'?json({status:'ok',records:dataset.rows.length}):json({error:'GET 요청만 지원합니다.'},405);
  if(pathname==='/api/toilets')return request.method==='GET'?json(dataset):json({error:'GET 요청만 지원합니다.'},405);
  if(!['/api/nearest','/api/search','/api/chat'].includes(pathname))return json({error:'API를 찾을 수 없습니다.'},404);
