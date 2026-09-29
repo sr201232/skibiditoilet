@@ -9,7 +9,7 @@ export async function handleApi(request,dataset,interpret=interpretQuery,env=pro
   if(request.method!=='GET')return json({error:'GET 요청만 지원합니다.'},405);
   const supabaseUrl=env.SUPABASE_URL,supabaseKey=env.SUPABASE_PUBLISHABLE_KEY;
   if(!supabaseUrl||!supabaseKey)return json({error:'로그인 연결 설정이 필요합니다.'},503);
-  return json({supabaseUrl,supabaseKey});
+  return json({supabaseUrl,supabaseKey,googleEnabled:env.GOOGLE_AUTH_ENABLED==='true'});
  }
  if(pathname==='/api/health')return request.method==='GET'?json({status:'ok',records:dataset.rows.length}):json({error:'GET 요청만 지원합니다.'},405);
  if(pathname==='/api/toilets')return request.method==='GET'?json(dataset):json({error:'GET 요청만 지원합니다.'},405);

@@ -74,7 +74,10 @@ SUPABASE_URL=https://프로젝트-id.supabase.co
 SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 GROQ_API_KEY=gsk_...
 GROQ_MODEL=openai/gpt-oss-20b
+GOOGLE_AUTH_ENABLED=false
 ```
+
+Google OAuth 제공자를 Supabase에서 연결한 뒤 `GOOGLE_AUTH_ENABLED=true`로 바꾸면 로그인 창에 Google 버튼이 표시됩니다.
 
 Supabase의 secret/service-role 키는 웹 브라우저나 GitHub에 넣지 않습니다. 읽기 전용 RLS 정책이 적용된 publishable key만 Vercel 서버에 설정합니다.
 

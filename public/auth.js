@@ -37,11 +37,10 @@ async function logout(){if(client)await client.auth.signOut();byId('auth-dialog'
 
 export const ready=(async()=>{
  ensureDialog();byId('auth-button')?.addEventListener('click',openAuth);
- try{const response=await fetch('/api/config');if(!response.ok)throw Error();const config=await response.json();client=createClient(config.supabaseUrl,config.supabaseKey,{auth:{persistSession:true,detectSessionInUrl:true}});session=(await client.auth.getSession()).data.session;client.auth.onAuthStateChange((_event,next)=>{session=next;render();});render();return client;}catch{const button=byId('auth-button');if(button){button.textContent='로그인 준비 중';button.disabled=true;}message('로그인 연결 설정을 확인해 주세요.',true);return null;}
+ try{const response=await fetch('/api/config');if(!response.ok)throw Error();const config=await response.json();byId('google-login').hidden=!config.googleEnabled;document.querySelector('.auth-divider').hidden=!config.googleEnabled;client=createClient(config.supabaseUrl,config.supabaseKey,{auth:{persistSession:true,detectSessionInUrl:true}});session=(await client.auth.getSession()).data.session;client.auth.onAuthStateChange((_event,next)=>{session=next;render();});render();return client;}catch{const button=byId('auth-button');if(button){button.textContent='로그인 준비 중';button.disabled=true;}message('로그인 연결 설정을 확인해 주세요.',true);return null;}
 })();
 
 export const getSupabase=()=>client;
 export const getSession=()=>session;
 export function onAuthChange(listener){listeners.add(listener);return()=>listeners.delete(listener);}
 export function requireLogin(){if(session)return session;openAuth();return null;}
-
